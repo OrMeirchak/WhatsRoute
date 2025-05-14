@@ -1,7 +1,7 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
-
+require('./outgoing-server');
 // CONFIGURABLE URL
 const EXTERNAL_SERVER_URL = 'http://localhost:3000/receive-whatsapp-data';
 
