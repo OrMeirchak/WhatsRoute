@@ -34,14 +34,17 @@ client.on('ready', () => {
 
 client.on('message', async msg => {
     try {
-        // Check for voice note
+        const sender = msg.from;
+        console.log(`📲 Message received from: ${sender}`);
+
+        // Voice message
         if (msg.hasMedia) {
             const media = await msg.downloadMedia();
             if (media.mimetype === 'audio/ogg; codecs=opus') {
-                console.log(`voice voice ${new Date().toISOString()}`);
+                console.log(`🎤 Voice message from ${sender} at ${new Date().toISOString()}`);
                 await sendToServer({
                     type: 'voice',
-                    from: msg.from,
+                    from: sender,
                     timestamp: msg.timestamp,
                     mimetype: media.mimetype,
                     data: media.data
@@ -49,18 +52,17 @@ client.on('message', async msg => {
             }
         }
 
-        // Check for location message
+        // Location message
         if (msg.type === 'location') {
             const location = msg.location;
-            console.log(`location location ${new Date().toISOString()}`);
-
-            sendMessageToServer(msg.from, `latitude : ${location.latitude}. longitude : ${location.longitude}. ${location.description}`);
+            console.log(`📍 Location message from ${sender} at ${new Date().toISOString()}`);
+            sendMessageToServer(sender, `latitude : ${location.latitude}. longitude : ${location.longitude}. ${location.description}`);
         }
 
-        // Check for text message
+        // Text message
         if (msg.type === 'chat') {
-            console.log(`text text ${new Date().toISOString()}`);
-            sendMessageToServer(msg.from, msg.body);
+            console.log(`💬 Text message from ${sender} at ${new Date().toISOString()}`);
+            sendMessageToServer(sender, msg.body);
         }
 
     } catch (err) {
