@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const { client, sendWhatsappMessage } = require('./index'); // ודא שהפונקציות האלה export-ed
+const cors = require('cors');
+
+// ייבוא ישיר של הפונקציה מהקובץ index.js
+const { sendWhatsappMessage } = require('./index');
 
 const app = express();
-const PORT = 5000;
-
+app.use(cors());
 app.use(bodyParser.json());
 
 app.post('/send', async (req, res) => {
@@ -16,17 +18,13 @@ app.post('/send', async (req, res) => {
 
     try {
         await sendWhatsappMessage(phoneNumber, message);
-        res.status(200).json({ status: 'Message sent successfully' });
+        res.status(200).json({ success: true });
     } catch (error) {
         console.error('Error sending WhatsApp message:', error);
-        res.status(500).json({ error: 'Failed to send message' });
+        res.status(500).json({ error: 'Failed to send WhatsApp message' });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`📤 Outgoing WhatsApp server listening on port ${PORT}`);
+app.listen(5000, () => {
+    console.log('Outgoing WhatsApp server listening on port 5000');
 });
-module.exports = {
-    client,
-    sendWhatsappMessage
-};

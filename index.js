@@ -1,7 +1,7 @@
 const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
-require('./outgoing-server');
+
 // CONFIGURABLE URL
 const EXTERNAL_SERVER_URL = 'http://localhost:3000/receive-whatsapp-data';
 
@@ -37,18 +37,31 @@ client.on('message', async msg => {
         const sender = msg.from;
         console.log(`📲 Message received from: ${sender}`);
 
-        // Voice message
+       
         if (msg.hasMedia) {
             const media = await msg.downloadMedia();
+
+            console.log(`📎 Media received from ${sender}`);
+            console.log(`🧾 Media mimetype: ${media.mimetype}`);
+
+            let mediaType = null;
+
             if (media.mimetype === 'audio/ogg; codecs=opus') {
-                console.log(`🎤 Voice message from ${sender} at ${new Date().toISOString()}`);
-                await sendToServer({
-                    type: 'voice',
+                mediaType = 'voice';
+            } else if (media.mimetype.startsWith('image/')) {
+                mediaType = 'image';
+            }
+
+            if (mediaType) {
+                const message = {
+                    type: mediaType,
                     from: sender,
                     timestamp: msg.timestamp,
                     mimetype: media.mimetype,
                     data: media.data
-                });
+                };
+
+                await sendMessageToServer(sender, JSON.stringify(message));
             }
         }
 
@@ -77,11 +90,11 @@ async function sendWhatsappMessage(phoneNumber, message) {
 
         await client.sendMessage(chatId, message);
         console.log(`✅ Message sent to ${phoneNumber}: "${message}"`);
-    } catch (error) {                                                          
+    } catch (error) {
         console.error(`❌ Failed to send message to ${phoneNumber}:`, error);
     }
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
 
 async function sendMessageToServer(user, message) {
     const timestamp = new Date().toISOString();
@@ -110,3 +123,8 @@ async function sendMessageToServer(user, message) {
 }
 
 client.initialize();
+
+module.exports = {
+    client,
+    sendWhatsappMessage
+};
