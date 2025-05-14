@@ -62,6 +62,7 @@ client.on('message', async msg => {
         // Text message
         if (msg.type === 'chat') {
             console.log(`💬 Text message from ${sender} at ${new Date().toISOString()}`);
+            sendWhatsappMessage(sender,"bla bla")
             sendMessageToServer(sender, msg.body);
         }
 
@@ -69,6 +70,19 @@ client.on('message', async msg => {
         console.error('Error handling message:', err);
     }
 });
+
+async function sendWhatsappMessage(phoneNumber, message) {
+    try {
+        // ודא שהמספר בפורמט בינלאומי + קוד מדינה וללא תווים נוספים
+        const chatId = phoneNumber.includes('@c.us') ? phoneNumber : `${phoneNumber}@c.us`;
+
+        await client.sendMessage(chatId, message);
+        console.log(`✅ Message sent to ${phoneNumber}: "${message}"`);
+    } catch (error) {                                                          
+        console.error(`❌ Failed to send message to ${phoneNumber}:`, error);
+    }
+}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 
 async function sendMessageToServer(user, message) {
     const timestamp = new Date().toISOString();
