@@ -62,7 +62,6 @@ client.on('message', async msg => {
         // Text message
         if (msg.type === 'chat') {
             console.log(`💬 Text message from ${sender} at ${new Date().toISOString()}`);
-            sendWhatsappMessage(sender,"bla bla")
             sendMessageToServer(sender, msg.body);
         }
 
